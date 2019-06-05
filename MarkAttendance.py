@@ -1,27 +1,22 @@
 import cv2
 import numpy as np
-from os import walk,sep
+from os import walk,sep,path
 from functools import reduce
+
 data_path = 'faces'
+onlyfiles = []
+# r=root, d=directories, f = files
+for r, d, f in walk(data_path):
+    for file in f:
+        onlyfiles.append(path.join(r, file))
 
-onlyfiles = {}
-data_path = data_path.rstrip(sep)
-start = data_path.rfind(sep) + 1
-for path, dirs, files in walk(data_path):
-    folders = path[start:].split(sep)
-    subdir = dict.fromkeys(files)
-    parent = reduce(dict.get, folders[:-1], onlyfiles)
-    parent[folders[-1]] = subdir
-
-counter = 0
 Training_Data, Labels = [], []
-for i in onlyfiles['faces'].items():
-    for j in i[1].keys():
-        image_path = data_path +'/'+ i[0]+'/'+j
-        images = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
-        Training_Data.append(np.asarray(images, dtype=np.uint8))
-        Labels.append(counter)
-        counter = counter + 1
+for i,files in enumerate (onlyfiles):
+   image_path = files
+   images = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+   Training_Data.append(np.asarray(images, dtype=np.uint8))
+   Labels.append(i)
+
 
 Labels = np.asarray(Labels, dtype=np.int32)
 
